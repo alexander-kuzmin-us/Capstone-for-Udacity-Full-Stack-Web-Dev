@@ -1,127 +1,191 @@
-# Capstone project for Udacity Full Stack Web Developer NanoDegree
+# Charter Company Management System
 
-## CHARTER COMPANY Specifications
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Flask](https://img.shields.io/badge/Flask-2.1.3-green.svg)](https://flask.palletsprojects.com/)
 
-The Charter Company is a company that is responsible for providing and managing charters and assigning crew members to those charters.
-You are a Head of the Charter Department within the company and are creating a system to simplify and streamline your process.
-In order to communicate with application, got to
-[The Charter Company]() 
-use the credentials for the different roles provided below in Roles to log in,
-copy and use jwt_token to get endpoints.
+A full-stack web application for managing charters and crew assignments in a charter company. This project was developed as a capstone for the Udacity Full Stack Web Developer Nanodegree.
 
-### Models:
+## 📋 Table of Contents
 
-- `Charters` with the attributes charters_name and departure_date.
+- [Overview](#overview)
+- [Features](#features)
+- [Data Models](#data-models)
+- [API Endpoints](#api-endpoints)
+- [Authentication & Authorization](#authentication--authorization)
+- [Installation & Setup](#installation--setup)
+- [Running Tests](#running-tests)
+- [Technology Stack](#technology-stack)
+- [Contributing](#contributing)
 
-- `Skippers` with attributes name, age and gender.
+## 🚢 Overview
 
-### Endpoints:
+The Charter Company Management System provides a streamlined interface for managing charter bookings and skipper assignments. As the Head of the Charter Department, you can use this application to manage charters, assign crew members, track departures, and maintain your fleet operations in one centralized platform.
 
-- **GET** `/charters`
+## ✨ Features
 
-    To get all the charters in the db and displays them as json format.
+- **Charter Management**: Create, view, update, and delete charter bookings
+- **Skipper Assignments**: Manage skipper assignments to specific charters
+- **Role-Based Access Control**: Different permission levels for various roles in the organization
+- **RESTful API**: Full API access with proper authentication and authorization
+- **Secure Authentication**: JWT-based authentication with Auth0 integration
+
+## 📊 Data Models
+
+The application is built around two core models:
+
+### Charter Model
+
 ```
+Charter {
+  id: Integer (Primary Key)
+  charters_name: String
+  departure_date: Date
+  skippers: Relationship to Skipper model
+}
+```
+
+### Skipper Model
+
+```
+Skipper {
+  id: Integer (Primary Key)
+  name: String
+  age: Integer
+  gender: String
+  charter_id: Integer (Foreign Key to Charter)
+}
+```
+
+## 🔌 API Endpoints
+
+### Charter Endpoints
+
+| Method | Endpoint | Description | Required Permission |
+|--------|----------|-------------|---------------------|
+| GET | `/charters` | Retrieve all charters | `view:charters` |
+| POST | `/charters/create` | Create a new charter | `create:charter` |
+| PATCH | `/charters/patch/<id>` | Update a charter | `edit:charter` |
+| DELETE | `/charters/delete/<id>` | Delete a charter | `delete:charter` |
+
+### Skipper Endpoints
+
+| Method | Endpoint | Description | Required Permission |
+|--------|----------|-------------|---------------------|
+| GET | `/skippers` | Retrieve all skippers | `view:skippers` |
+| POST | `/skippers/create` | Create a new skipper | `create:skipper` |
+| PATCH | `/skippers/patch/<id>` | Update a skipper | `edit:skipper` |
+| DELETE | `/skippers/delete/<id>` | Delete a skipper | `delete:skipper` |
+
+### API Usage Examples
+
+Retrieve all charters:
+```bash
 curl -X GET \
   https://charterscompany.herokuapp.com/charters \
-  -H 'Authorization: Bearer <INSERT_YOUR_TOKEN>'
+  -H 'Authorization: Bearer <YOUR_JWT_TOKEN>'
 ```
 
-- **GET** `/skippers`
-
-    To get all the skippers in the db and displays them as json format.
-```
-curl -X GET \
-  https://charterscompany.herokuapp.com/skippers \
-  -H 'Authorization: Bearer <INSERT_YOUR_TOKEN>'
-```
-- **POST** `/charters/create`
-
-    To create a new Charter based on the json data in the body of the request.
-```
-curl -X POST \
-  https://charterscompany.herokuapp.com/charters/create \
-  -H 'Authorization: Bearer <INSERT_YOUR_TOKEN>'
-```
-
-- **POST** `/skippers/create`
-
-    To create a new Skipper based on the json data in the body of the request.
-```
+Create a new skipper:
+```bash
 curl -X POST \
   https://charterscompany.herokuapp.com/skippers/create \
-  -H 'Authorization: Bearer <INSERT_YOUR_TOKEN>'
+  -H 'Authorization: Bearer <YOUR_JWT_TOKEN>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "John Smith",
+    "age": 35,
+    "gender": "male",
+    "charter_id": 1
+  }'
 ```
 
-- **DELETE** `/charters/delete/int:charter_id`
+## 🔐 Authentication & Authorization
 
-    To delete the Charter with given Charter ID.
-```
-curl -X DELETE \
-  https://charterscompany.herokuapp.com/charters/delete/int:charter_id \
-  -H 'Authorization: Bearer <INSERT_YOUR_TOKEN>'
-```
+The application uses Auth0 for authentication and implements role-based access control. Three roles are available:
 
-- **DELETE** `/skippers/delete/int:skipper_id`
+### Charter Assistant
+- Can view skippers and charters
+- Permissions: `view:charters`, `view:skippers`
 
-    To delete the Skipper with given ID.
-```
-curl -X DELETE \
-  https://charterscompany.herokuapp.com/skippers/delete/int:skipper_id \
-  -H 'Authorization: Bearer <INSERT_YOUR_TOKEN>'
-```
+### Charter Director
+- All Charter Assistant permissions
+- Can add, delete, and modify skippers
+- Can modify charters
+- Permissions: `view:charters`, `view:skippers`, `create:skipper`, `delete:skipper`, `edit:skipper`, `edit:charter`
 
-- **PATCH** `/skippers/patch/int:skipper_id`
+### Head of the Charter Department
+- All Charter Director permissions
+- Can add and delete charters
+- Permissions: `view:charters`, `view:skippers`, `create:skipper`, `delete:skipper`, `edit:skipper`, `edit:charter`, `create:charter`, `delete:charter`
 
-    To modify the Skipper with given ID.
-```
-curl -X PATCH \
-  https://charterscompany.herokuapp.com/skippers/patch/int:skipper_id \
-  -H 'Authorization: Bearer <INSERT_YOUR_TOKEN>'
-```
+## ⚙️ Installation & Setup
 
-- **PATCH** `/charters/patch/int:charter_id`
+### Prerequisites
+- Python 3.8+
+- PostgreSQL
+- pip
+- virtualenv (recommended)
 
-    To modify the Charter with given ID.
-```
-curl -X PATCH \
-  https://charterscompany.herokuapp.com/charters/patch/int:charter_id \
-  -H 'Authorization: Bearer <INSERT_YOUR_TOKEN>'
-```
-### Roles:
+### Installation Steps
 
-- `Charter Assistant`
-Can view skippers and charters
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/charter-company.git
+   cd charter-company
+   ```
 
-Auth0 credentials: 
-    username: 
-    password: 
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-- `Charter Director`
-All permissions a Charter Assistant has and 
-add or delete a skippers from the database
-Modify skippers or charters
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Auth0 credentials: 
-    username: 
-    password: 
-    
-- `Head of the Charter Department`
-All permissions a Charter Director has and 
-add or delete a charter from the database
+4. Set up your database:
+   ```bash
+   # Create a PostgreSQL database
+   sudo -u postgres createdb charters
+   
+   # Apply migrations
+   python manage.py db upgrade
+   ```
 
-Auth0 credentials: 
-    username: 
-    password: 
+5. Start the application:
+   ```bash
+   gunicorn app:app
+   ```
 
-### Tests:
+## 🧪 Running Tests
 
-- One test for success behavior of each endpoint
-- One test for error behavior of each endpoint
-- At least two tests of RBAC for each role
+The application includes a comprehensive test suite that verifies endpoint functionality and permission controls:
 
-To test the API, first create a test database in postgres and then execute the tests as follows:
-
-```
+```bash
+# Create a test database
 sudo -u postgres createdb test_db
+
+# Run tests
 python test_app.py
 ```
+
+## 💻 Technology Stack
+
+- **Backend**: Flask, Python
+- **Database**: PostgreSQL, SQLAlchemy
+- **Authentication**: Auth0, JWT
+- **Deployment**: Heroku
+- **Other Tools**: Flask-Migrate, Flask-CORS, Gunicorn
+
+## 🤝 Contributing
+
+Contributions to this project are welcome! Please feel free to submit a pull request or open an issue if you find any bugs or have suggestions for improvements.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
