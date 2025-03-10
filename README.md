@@ -124,7 +124,7 @@ The application uses Auth0 for authentication and implements role-based access c
 ### Prerequisites
 - Python 3.8+
 - PostgreSQL
-- pip
+- pip3
 - virtualenv (recommended)
 
 ### Installation Steps
@@ -143,7 +143,7 @@ The application uses Auth0 for authentication and implements role-based access c
 
 3. Install dependencies:
    ```bash
-   pip install -r requirements.txt
+   pip3 install -r requirements.txt
    ```
 
 4. Set up your database:
@@ -152,7 +152,7 @@ The application uses Auth0 for authentication and implements role-based access c
    sudo -u postgres createdb charters
    
    # Apply migrations
-   python manage.py db upgrade
+   python3 manage.py db upgrade
    ```
 
 5. Start the application:
@@ -169,7 +169,7 @@ The application includes a comprehensive test suite that verifies endpoint funct
 sudo -u postgres createdb test_db
 
 # Run tests
-python test_app.py
+python3 test_app.py
 ```
 
 ## 💻 Technology Stack
